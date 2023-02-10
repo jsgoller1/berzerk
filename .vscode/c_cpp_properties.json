@@ -1,0 +1,51 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/3rdparty/",
+                "${workspaceFolder}/berzerk/",
+                "${workspaceFolder}/berzerk/animation/",
+                "${workspaceFolder}/berzerk/audio/",
+                "${workspaceFolder}/berzerk/drawing/",
+                "${workspaceFolder}/berzerk/gameobject/",
+                "${workspaceFolder}/berzerk/gameobject/bullet",
+                "${workspaceFolder}/berzerk/gameobject/gameobject",
+                "${workspaceFolder}/berzerk/gameobject/robot",
+                "${workspaceFolder}/berzerk/gameobject/wall",
+                "${workspaceFolder}/berzerk/level/",
+                "${workspaceFolder}/berzerk/main/",
+                "${workspaceFolder}/berzerk/math/",
+                "${workspaceFolder}/berzerk/texture/"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/clang",
+            "intelliSenseMode": "linux-clang-x64",
+            "configurationProvider": "ms-vscode.makefile-tools"
+        },
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/3rdparty/",
+                "${workspaceFolder}/berzerk/",
+                "${workspaceFolder}/berzerk/animation/",
+                "${workspaceFolder}/berzerk/audio/",
+                "${workspaceFolder}/berzerk/drawing/",
+                "${workspaceFolder}/berzerk/gameobject/",
+                "${workspaceFolder}/berzerk/gameobject/bullet",
+                "${workspaceFolder}/berzerk/gameobject/gameobject",
+                "${workspaceFolder}/berzerk/gameobject/robot",
+                "${workspaceFolder}/berzerk/gameobject/wall",
+                "${workspaceFolder}/berzerk/level/",
+                "${workspaceFolder}/berzerk/main/",
+                "${workspaceFolder}/berzerk/math/",
+                "${workspaceFolder}/berzerk/texture/"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/local/bin/clang-format",
+            "intelliSenseMode": "macos-clang-x64",
+            "configurationProvider": "ms-vscode.makefile-tools"
+        }
+    ],
+    "version": 4
+}

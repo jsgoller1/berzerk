@@ -1,0 +1,207 @@
+#include <vector>
+
+// This is just a placeholder; we will actually want to choose
+// collection types later.
+#define collection std::vector
+
+class GameObject {
+  /*
+   * Evil otto will not die on collision with characters, and is able to move through walls; otherwise,
+   * robots and characters die whenever they touch anything (walls, bullets, each other). So we really only need
+   * a gameObjectCollisionEvent() handler that just calls Character::kill().
+   *
+   * Here are some ways that we could make this more technically correct but might overengineer the situation:
+   * - Since Evil Otto is invulnerable, he shouldn't have a `.kill()` method. However, `Robot` and `Player` need to call
+   * `.kill()` in `gameObjectCollisionEvent()`. Thus, we could make Character an ABC, create an `IKillable` class with
+   * `IKillable::kill()`, and then have `class Robot : IKillable, Character { ... }`, and they implement the pure
+   * virtual `Character::gameObjectCollisionEvent()` with one that calls `IKillable::kill()`. Then have `class EvilOtto
+   * : Character { ... }` and its implementations of wallCollisionEvent() and gameObjectCollisionEvent() do nothing.
+   *
+   * - Technically, we may not want every game object collision to kill the character. If not, we could implement
+   * Character::gameObjectCollisionEvent() instead as virtual Character::gameObjectCollisionEvent(gameObject) = 0, and
+   * also add pure virtual methods for bulletCollisionEvent(), robotCollisionEvent(), and playerCollisionEvent(). Each
+   * Character would then be responsible for implementing these methods (i.e. determining what happens when it collides
+   * with that thing). This is probably overkill though, because we aren't going to add any new characters or features
+   * to berserk and are just going to stick with the original game's "characters die if they touch anything".
+   */
+  Vect2D getCurrentPosition();
+
+  Vect2D getVelocity();
+  Vect2D setVelocity();
+
+  bool getCollisionTestFlag();
+  bool setCollisionTestFlag();
+  bool collisionTestGameObject();
+  bool collisionTestWall();
+  virtual void resolveCollisionGameObject() = 0;
+  virtual void resolveCollisionWall() = 0;
+};
+
+class IShooter {
+  void shoot(direction) {
+    // Deploy a Bullet heading in one of the 8 compass directions
+  }
+};
+
+class Robot : public GameObject, public IShooter {
+ public:
+  doAI() {
+    /*
+     * Behavior based on states:
+     * IDLE:
+     * - use idling animations
+     * - If player is detected with lineScan:
+     *    - Transition to ATTACKING
+     *    - Set destination to player position
+     * - If player is detected with areaDetect():
+     *    - Transition to MOVING
+     *    - Request new path from grid with destination at player coords
+     * MOVING:
+     * - use walking animations
+     * - If player is detected with lineScan:
+     *    - Transition to ATTACKING,
+     *    - Set destination to player position
+     * - If player is detected with areaDetect():
+     *    - Request new path if destination (i.e. player position) differs significantly from current destination (i.e.
+     *      different room)
+     * - If destination is reached:
+     *    - Transition to IDLE
+     * ATTACKING:
+     * - shoot up to K times // difficulty adjustment; more frequent scanning/detecting is "smarter"
+     * - If player is detected with lineScan:
+     *    - reset K counter (continue shooting
+     * - Else:
+     *    - Dumb: try walking directly to player's last position (may walk into a wall, especially if in another room!)
+     *    - Smart: set destination to player's last position, transition to MOVING
+     * (no point in exploring other cases here; we should always attempt to chase the player if we line-scanned them and
+     * then didn't)
+     *
+     */
+  }
+
+ private:
+  enum CharacterState { IDLE, PATROLLING, ATTACKING };
+  CharacterState state;
+
+  areaDetect() {
+    /*
+     * Equivalent to "hearing the player". The robot checks if the player is within range (even through walls). If so,
+     * it navigates to the nav point nearest to the player.
+     */
+  }
+  lineScan() {
+    /*
+     * Equivalent to "seeing the player."If a robot has can hit the player, it should begin shooting at it, clear its
+     * navigation queue, and begin navigating to the player's last known position.
+     */
+  }
+  Vect2D detectPlayer() { Vect2D coords = this->getCurrentPosition(); }
+};
+class Player : public GameObject, public IShooter {};
+class Bullet : public GameObject {};
+class EvilOtto : public GameObject {};
+
+class Grid {
+  /*
+    The grid represents the game space where the player and robots exist. We will start with a 3x3 grid that looks like
+    this:
+     —————       —————
+    |           |     |
+    |           |     |
+    |           |     |
+           —————
+    |     |           |
+    |     |           |
+    |     |           |
+
+    |           |     |
+    |           |     |
+    |           |     |
+     ————— —————
+   */
+ public:
+  Grid() {}
+  navigate(startPoint, endPoint) {}
+
+ private:
+};
+
+class Game {
+ public:
+  Game() {
+    initUI() {
+      // The UI (lives remaining and score) should take up
+      // the bottom 10% of the screen or less
+    }
+  }
+  ~Game() {}
+
+  void getInput() {
+    case WASD:
+      player.setVelocity();
+    case arrows:
+      player.shoot(direction);
+    case escape:
+      quit();
+  }
+
+  void updateWinLoseConditions() {
+    // Player wins if they are at exit; maybe just check if their coordinates are outside the grid?
+    // Player loses if they have zero lives
+  }
+
+  void updateAnimations() {}
+
+  void updateAI() {
+    for (each robot) {
+      doAI();
+    }
+  }
+
+  void updateCollisions() {
+    // There are not going to be that many walls, robots, or projectiles; probably 10 robots and a player, each of whom
+    // can fire a projectile (so 22 objects at most). We could try doing 22 x 22 collision tests, but then we have to
+    // test walls on top of that. Another option would be a kind of space partitioning; we maintain a list-of-lists of
+    // the contents of every room (walls, projectiles, and characters). A character or projectile would
+    // test (based on its corners) what room its in before moving and then after, then update the list-of-lists
+    // accordingly. We also don't need to test collisions on anything that didn't move.
+
+    for (each gameObject) {
+      if (!gameObject.getCollisionTestFlag()) {
+        continue;
+      }
+      gameObject.setCollisionTestFlag(false);
+      GameObject* collisionTarget = this->collisionTestGameObjects(gameObject);
+      if (collisionTarget != nullptr) {
+        gameObject.resolveCollisionGameObject(collisionTarget);
+      }
+      if (gameObject.collisionTestWall()) {
+        gameObject.resolveCollisionWall();
+      }
+    }
+  }
+
+  void moveCharacters() {}
+
+  void draw() {
+    // draw textures and stuff
+  }
+
+ private:
+  Grid* grid;
+  Player* player;
+  collection<Robot*> robots;
+}
+
+void main() {
+  Game game = Game();
+  while (!(game.shouldQuit())) {
+    game.getInput();
+    game.updateWinLoseConditions();
+    game.updateAnimations();  // probably involves something time based and selecting a texture from a sprite sheet
+    game.updateAI();
+    game.moveCharacters();  // according to their velocity
+    game.updateCollisions();
+    game.draw();
+  }
+}
